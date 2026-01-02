@@ -1,0 +1,20 @@
+# --- Dependencies ---
+node_modules
+**/node_modules
+
+# --- Security (Environment Variables) ---
+.env
+**/.env
+
+# --- Build Outputs ---
+dist
+build
+
+# --- Logs & OS Files ---
+logs
+*.log
+.DS_Store
+
+# --- Uploads (Don't push local test images) ---
+backend/uploads/*
+!backend/uploads/.gitkeep
