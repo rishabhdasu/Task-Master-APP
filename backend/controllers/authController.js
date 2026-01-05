@@ -30,7 +30,12 @@ exports.registerUser = async (req, res) => {
     });
     return res.status(200).json({
       id: user._id,
-      user,
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        profileImageUrl: user.profileImageUrl,
+      },
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -56,8 +61,68 @@ exports.loginUser = async (req, res) => {
     }
     return res.status(200).json({
       id: user._id,
-      user,
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        profileImageUrl: user.profileImageUrl,
+      },
       token: generateToken(user._id),
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Something went wrong",
+      error: err.message,
+    });
+  }
+};
+
+// Get All User Info
+
+exports.getUserInfo = async (req, res) => {
+  try {
+    const user = await User.findById(req.body.user.id).select("-password");
+    if (!user) {
+      return res.status(400).json({
+        message: "User not found",
+      });
+    }
+    return res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({
+      message: "Something went wrong",
+      error: err.message,
+    });
+  }
+};
+
+// Update User
+
+exports.updateUser = async (req, res) => {
+  const { fullName, password, profileImageUrl } = req.body;
+  try {
+    const user = await User.findById(req.user);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (fullName) {
+      user.fullName = fullName;
+    }
+    if (profileImageUrl) {
+      user.profileImageUrl = profileImageUrl;
+    }
+    if (password) {
+      user.password = password;
+    }
+    await user.save();
+    res.status(200).json({
+      message: "User details updated successfully",
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        profileImageUrl: user.profileImageUrl,
+      },
     });
   } catch (err) {
     res.status(500).json({
